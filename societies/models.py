@@ -1,10 +1,9 @@
 from django.db import models
-
+from django.core.exceptions import ValidationError
 # Create your models here.
 class Society(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
-    members = models.ManyToManyField('Member')
 
     def __str__(self):
         return self.name
@@ -13,6 +12,10 @@ class Member(models.Model):
     age = models.IntegerField(default=0)
     contact = models.IntegerField(default=0)
     address = models.CharField(max_length=100)
+    society = models.ManyToManyField(Society)
     def __str__(self):
         return self.name
-
+    def clean(self, *args, **kwargs):
+        if self.society.count() > 3:
+            raise ValidationError("You can't assign to more than three societies")
+        super(Society, self).clean(*args, **kwargs)
