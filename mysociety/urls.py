@@ -18,8 +18,8 @@ from django.urls import path,include
 from societies.views import create_society, add_member
 
 urlpatterns = [
-    #path('add_soc/', create_society),
-    #path('add_mem/', add_member),
-    path('',include('societies.urls')),
+    path('add_soc/', create_society),
+    path('add_mem/', add_member),
+    #path('',include('societies.urls')),
     path('admin/', admin.site.urls),
 ]
