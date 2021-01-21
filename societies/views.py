@@ -3,6 +3,7 @@ from . models import Society,Member
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
 from django.http import JsonResponse
 
@@ -29,13 +30,26 @@ def add_member(request):
 		address= request.POST.get('d5')
 		mem = Member(member_id= mid, name= name, age= age, 
 			contact= contact, address= address)
+
 		mem.save()
 		data= request.POST.get('d6')
-		soc = Society.objects.get(name= data)
-		mem.society.add(soc)	
-		res = {
-			'success': True,
+		dat=data.split(',')
+		if len(dat) > 3 :
+			res = {
+				'failure': False,
 			}
+		else:
+			for d in dat:
+				soc = Society.objects.get(name= d)
+				mem.society.add(soc)	
+			res = {
+				'success': True,
+			}
+
+	else:
+		res = {
+			'failure': False,
+		}
 	return JsonResponse(res)	
 
 
