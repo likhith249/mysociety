@@ -9,13 +9,14 @@ class Society(models.Model):
     def __str__(self):
         return self.name
 
+
 class Member(models.Model):
     member_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     age = models.IntegerField(default=0)
     contact = models.IntegerField(default=0)
     address = models.CharField(max_length=100)
-    society = models.ManyToManyField(Society)
+    society = models.ManyToManyField(Society, blank=True)
 
     def __str__(self):
         return self.name
