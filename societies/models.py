@@ -25,3 +25,12 @@ class Member(models.Model):
         if self.society.count() > 3:
             raise ValidationError("You can't assign to more than three societies")
         super(Member, self).clean(*args, **kwargs)
+
+
+class Dues(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    society = models.ForeignKey(Society, on_delete=models.CASCADE)
+    due = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('member', 'society')        

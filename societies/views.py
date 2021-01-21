@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from . models import Society,Member
+from . models import Society,Member,Dues
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -7,6 +7,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
 # Create your views here.
+
+@method_decorator(csrf_exempt)
+def add_due(request):
+	if request.method == 'POST':
+		mem = Member.objects.get(name= request.POST.get('d1')) 
+		soc = Society.objects.get(name= request.POST.get('d2')) 
+		Dues.objects.create(member= mem, society=soc, due=request.POST.get('d3'))
+		res = {
+			'success': True,
+			}
+	return JsonResponse(res)
+
 
 @method_decorator(csrf_exempt)
 def create_society(request):
@@ -37,6 +49,7 @@ def add_member(request):
 			'success': True,
 			}
 	return JsonResponse(res)	
+
 
 
 

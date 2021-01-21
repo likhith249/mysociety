@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from societies.views import create_society, add_member
+from societies.views import create_society, add_member, add_due
 
 urlpatterns = [
     path('add_soc/', create_society),
     path('add_mem/', add_member),
+    path('add_due/', add_due),
     path('admin/', admin.site.urls),
 ]
