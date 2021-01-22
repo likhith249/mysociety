@@ -23,4 +23,5 @@ urlpatterns = [
     path('add_due/', add_due),
     #path('',include('societies.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/',include('accounts.urls'))
 ]
