@@ -13,11 +13,24 @@ from django.http import JsonResponse
 def add_due(request):
 	if request.method == 'POST':
 		mem = Member.objects.get(name= request.POST.get('d1')) 
-		soc = Society.objects.get(name= request.POST.get('d2')) 
-		Dues.objects.create(member= mem, society=soc, due=request.POST.get('d3'))
-		res = {
-			'success': True,
-		}
+		soc = Society.objects.get(name= request.POST.get('d2'))
+		try:
+			dues = Dues.objects.get(member=mem,society=soc)
+		except Dues.DoesNotExist:
+			dues = None
+		if dues is not None:
+			d = request.POST.get('d3')
+			dues.due = d
+			dues.save()
+			res = {
+				'success': True,
+				'message': 'member is not in society',
+			}
+		else:
+			res = {
+				'failure': False,
+				'message': 'dues added',
+			}
 	return JsonResponse(res)
 
 @method_decorator(csrf_exempt)
@@ -29,10 +42,12 @@ def create_society(request):
 			Society.objects.create(name= name,address= address)
 			res = {
 				'success': True,
+				'message': 'society created',
 			}
 		else:
 			res = {
 			'failure': False,
+			'message': 'society name already taken',
 			}
 	return JsonResponse(res)
 
@@ -51,10 +66,12 @@ def create_member(request):
 			mem.save()
 			res = {
 				'success': True,
+				'message': 'member created',
 			}
 		else:
 			res = {
 				'failure': False,
+				'message': 'member already exists',
 			}
 
 	else:
@@ -72,12 +89,14 @@ def add_member(request):
 
 		if not Member.objects.filter(name=mem_name).exists():
 			res = {
-				'failure' : False,
+				#'message': 'member does not exist'
+				'failure': False,
 			}
 		else:
 			mem = Member.objects.get(name=mem_name)
 			if len(dat) + mem.society.count() > 3:
 				res = {
+					'message': 'member cannot be associated to more than 3 societies',
 					'failure': False,
 				}
 			else:
@@ -91,7 +110,8 @@ def add_member(request):
 			 			}
 						break
 				res = {
-					'success' : True,
+					'message': 'member added to societies',
+					'success': True,
 				}
 	else:
 		res = {
@@ -99,7 +119,3 @@ def add_member(request):
 		}
 	
 	return JsonResponse(res)
-
-
-
-    

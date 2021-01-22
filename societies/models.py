@@ -16,7 +16,7 @@ class Member(models.Model):
     age = models.IntegerField(default=0)
     contact = models.IntegerField(default=0)
     address = models.CharField(max_length=100)
-    society = models.ManyToManyField(Society, blank=True)
+    society = models.ManyToManyField(Society, blank=True,through='Dues')
 
     def __str__(self):
         return self.name
