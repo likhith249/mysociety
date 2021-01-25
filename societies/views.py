@@ -12,32 +12,51 @@ from django.http import JsonResponse
 @method_decorator(csrf_exempt)
 def add_due(request):
 	if request.method == 'POST':
-		mem = Member.objects.get(name= request.POST.get('d1')) 
-		soc = Society.objects.get(name= request.POST.get('d2'))
 		try:
-			dues = Dues.objects.get(member=mem,society=soc)
-		except Dues.DoesNotExist:
-			dues = None
-		if dues is not None:
-			d = request.POST.get('d3')
-			dues.due = d
-			dues.save()
-			res = {
-				'success': True,
-				'message': 'member is not in society',
-			}
+			mem = Member.objects.get(name= request.POST.get('member'))
+		except Member.DoesNotExist:
+			mem = None
+		try:
+			soc = Society.objects.get(name= request.POST.get('society'))
+		except Society.DoesNotExist:
+			soc = None
+		
+		if mem and soc is not None:
+
+			try:
+				dues = Dues.objects.get(member=mem,society=soc)
+			except Dues.DoesNotExist:
+				dues = None
+			if dues is not None:
+				d = request.POST.get('dues')
+				dues.due = d
+				dues.save()
+				res = {
+					'success': True,
+					'message': 'dues added',
+				}
+			else:
+				res = {
+					'Success': False,
+					'message': 'member and society not associated',
+				}
 		else:
 			res = {
-				'failure': False,
-				'message': 'dues added',
+				'Success': False,
+				'message': 'member or society does not exist'
 			}
+	else:
+		res = {
+			'Success': False,
+			'message': 'method is not post',
+		}
 	return JsonResponse(res)
 
 @method_decorator(csrf_exempt)
 def create_society(request):
 	if request.method == 'POST':
-		name= request.POST.get('data1')
-		address= request.POST.get('data2')
+		name= request.POST.get('name')
+		address= request.POST.get('address')
 		if not Society.objects.filter(name=name).exists():
 			Society.objects.create(name= name,address= address)
 			res = {
@@ -46,7 +65,7 @@ def create_society(request):
 			}
 		else:
 			res = {
-			'failure': False,
+			'Success': False,
 			'message': 'society name already taken',
 			}
 	return JsonResponse(res)
@@ -54,11 +73,11 @@ def create_society(request):
 @method_decorator(csrf_exempt)
 def create_member(request):
 	if request.method == 'POST':
-		mid= request.POST.get('d1')
-		name= request.POST.get('d2')
-		age= request.POST.get('d3')
-		contact= request.POST.get('d4')
-		address= request.POST.get('d5')
+		mid= request.POST.get('id')
+		name= request.POST.get('name')
+		age= request.POST.get('age')
+		contact= request.POST.get('contact')
+		address= request.POST.get('address')
 
 		if not Member.objects.filter(member_id=mid).exists():
 			mem = Member(member_id= mid, name= name, age= age, 
@@ -70,21 +89,22 @@ def create_member(request):
 			}
 		else:
 			res = {
-				'failure': False,
-				'message': 'member already exists',
+				'Success': False,
+				'message': 'member name already taken',
 			}
 
 	else:
 		res = {
-			'failure': False,
+			'Success': False,
+			'message': 'method is not post',
 		}
 	return JsonResponse(res)
 
 @method_decorator(csrf_exempt)
 def add_member(request):
 	if request.method == 'POST':
-		mem_name = request.POST.get('d1')
-		data = request.POST.get('d2')
+		mem_name = request.POST.get('name')
+		data = request.POST.get('societies')
 		dat=data.split(',')
 
 		if not Member.objects.filter(name=mem_name).exists():
@@ -106,7 +126,7 @@ def add_member(request):
 						mem.society.add(soc)
 					else:
 						res = {
-							'failure' : False,
+							'success' : False,
 			 			}
 						break
 				res = {
@@ -115,7 +135,8 @@ def add_member(request):
 				}
 	else:
 		res = {
-			'failure' : False,
+			'success': False,
+			'message': 'method is not post'
 		}
 	
 	return JsonResponse(res)
